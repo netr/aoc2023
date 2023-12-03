@@ -23,6 +23,39 @@ func ReadFileIntoSlice(path string) []string {
 	return lines
 }
 
-func IsNumber(char byte) bool {
+func IsNumber[T byte | rune](char T) bool {
 	return char >= '0' && char <= '9'
+}
+
+func AllDirs() [][]int {
+	dirs := [][]int{}
+	dirs = append(dirs, Dirs()...)
+	dirs = append(dirs, Diags()...)
+	return dirs
+}
+
+func Dirs() [][]int {
+	return [][]int{
+		{-1, 0}, // up
+		{1, 0},  // down
+		{0, -1}, // left
+		{0, 1},  // right
+	}
+}
+
+func Diags() [][]int {
+	return [][]int{
+		{-1, -1}, // up-left
+		{-1, 1},  // up-right
+		{1, -1},  // down-left
+		{1, 1},   // down-right
+	}
+}
+
+func RuneSliceToMap(symbols ...rune) map[rune]struct{} {
+	symbolsMap := map[rune]struct{}{}
+	for _, symbol := range symbols {
+		symbolsMap[symbol] = struct{}{}
+	}
+	return symbolsMap
 }
