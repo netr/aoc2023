@@ -38,7 +38,7 @@ func Test_SolveSchematicGearRatio(t *testing.T) {
 	}
 
 	if solveSchematicGearRatio(schematic) != 467835 {
-		t.Errorf("should be 4361")
+		t.Errorf("should be 467835")
 	}
 }
 

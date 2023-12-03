@@ -78,8 +78,9 @@ func solveSchematicGearRatio(schematics []string) int {
 			partsSeen := map[int]struct{}{}
 			if _, ok := symbolsMap[char]; ok {
 				for _, dir := range dirs {
-					if util.IsNumber(mat[i+dir[0]][j+dir[1]]) {
-						partNumber := getPartNumberFrom(schematics[i+dir[0]], j+dir[1])
+					row, col := i+dir[0], j+dir[1]
+					if util.IsNumber(mat[row][col]) {
+						partNumber := getPartNumberFrom(schematics[row], col)
 						if _, ok := partsSeen[partNumber]; ok {
 							continue
 						}
