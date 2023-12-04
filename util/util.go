@@ -3,6 +3,7 @@ package util
 import (
 	"bufio"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -58,4 +59,12 @@ func RuneSliceToMap(symbols ...rune) map[rune]struct{} {
 		symbolsMap[symbol] = struct{}{}
 	}
 	return symbolsMap
+}
+
+func MustAtoi(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }
