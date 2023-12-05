@@ -35,6 +35,15 @@ func AllDirs() [][]int {
 	return dirs
 }
 
+func SplitToInts(s string, sep string) []int {
+	items := strings.Split(s, " ")
+	res := []int{}
+	for _, item := range items {
+		res = append(res, MustAtoi(item))
+	}
+	return res
+}
+
 func Dirs() [][]int {
 	return [][]int{
 		{-1, 0}, // up
