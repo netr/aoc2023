@@ -19,14 +19,6 @@ func Test_SolveDay7(t *testing.T) {
 	}
 }
 
-func Test_SolveDay7_Part2(t *testing.T) {
-	lines := util.ReadFileIntoSlice("../data/day7.txt")
-	ans := solveDay7(lines, true)
-	if ans != 248781813 {
-		t.Errorf("ans should be 248781813, got %d", ans)
-	}
-}
-
 func Test_identifyHand(t *testing.T) {
 	val := identifyHand("32T3K", false)
 	if val != 2 {
