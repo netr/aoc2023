@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/netr/aoc/util"
@@ -42,35 +43,22 @@ func solveDay7(lines []string, js bool) int {
 		}
 	}
 
-	// sort cards by score
-	for i := 0; i < len(cards); i++ {
-		for j := 0; j < len(cards)-1; j++ {
-			if cards[j].Score < cards[j+1].Score {
-				cards[j], cards[j+1] = cards[j+1], cards[j]
-			}
-		}
-	}
-
 	// if scores are equal, sort by which hand has the higher first cards
-	for i := 0; i < len(cards); i++ {
-		for j := 0; j < len(cards)-1; j++ {
-			if cards[j].Score == cards[j+1].Score {
-				q := 0
-				for {
-					h1 := convertCardToNum(string(cards[j].Hand[q]), js)
-					h2 := convertCardToNum(string(cards[j+1].Hand[q]), js)
-					if h1 == h2 {
-						q++
-						continue
-					}
-					if h1 < h2 {
-						cards[j], cards[j+1] = cards[j+1], cards[j]
-					}
-					break
+	sort.Slice(cards, func(i, j int) bool {
+		if cards[i].Score == cards[j].Score {
+			q := 0
+			for {
+				h1 := convertCardToNum(string(cards[i].Hand[q]), js)
+				h2 := convertCardToNum(string(cards[j].Hand[q]), js)
+				if h1 == h2 {
+					q++
+					continue
 				}
+				return h1 > h2
 			}
 		}
-	}
+		return cards[i].Score > cards[j].Score
+	})
 
 	ans := 0
 	for i, c := range cards {
@@ -121,58 +109,72 @@ func identifyHand(hand string, js bool) int {
 		cards[string(c)]++
 	}
 
-	// check for 5 of a kind
-	goodCards := 0
+	gc := []int{}
 	for k, v := range cards {
-		if js {
-			if k == "J" {
-				continue
-			}
+		if js && k == "J" {
+			continue
 		}
-		if v == 5 {
-			return int(FiveOfAKind)
-		} else if v == 4 {
+		switch v {
+		case 2:
+			gc = append(gc, int(Pair))
+		case 3:
+			gc = append(gc, int(ThreeOfAKind))
+		case 4:
 			if js && cards["J"] == 1 {
 				return int(FiveOfAKind)
 			}
 			return int(FourOfAKind)
-		} else if v == 3 {
-			goodCards += 3
-		} else if v == 2 {
-			goodCards += 2
+		case 5:
+			return int(FiveOfAKind)
 		}
 	}
 
-	if goodCards == 5 {
-		return int(FullHouse)
-	} else if goodCards == 4 {
-		if js && cards["J"] == 1 {
+	// two hands found, don't need extra checks, can all return
+	if len(gc) == 2 {
+		if (gc[0] == int(Pair) && gc[1] == int(ThreeOfAKind)) ||
+			(gc[0] == int(ThreeOfAKind) && gc[1] == int(Pair)) {
 			return int(FullHouse)
-		}
-		return int(TwoPair)
-	} else if goodCards == 3 {
-		if js {
-			if cards["J"] == 1 {
-				return int(FourOfAKind)
-			} else if cards["J"] == 2 {
-				return int(FiveOfAKind)
+		} else if gc[0] == int(Pair) && gc[1] == int(Pair) {
+			if js && cards["J"] == 1 {
+				return int(FullHouse)
 			}
+			return int(TwoPair)
 		}
-		return int(ThreeOfAKind)
-	} else if goodCards == 2 {
-		if js {
-			if cards["J"] == 1 {
-				return int(ThreeOfAKind)
-			} else if cards["J"] == 2 {
-				return int(FourOfAKind)
-			} else if cards["J"] == 3 {
-				return int(FiveOfAKind)
-			}
-		}
-		return int(Pair)
 	}
 
-	if goodCards == 0 && js {
+	// one hand found, if no jokers, return the hand, else process
+	if len(gc) == 1 {
+		if !js {
+			return gc[0]
+		}
+
+		// check jokers, if jokers are present, return the next highest hand
+		switch gc[0] {
+		case int(Pair):
+			switch cards["J"] {
+			case 1:
+				return int(ThreeOfAKind)
+			case 2:
+				return int(FourOfAKind)
+			case 3:
+				return int(FiveOfAKind)
+			default:
+				return int(Pair)
+			}
+		case int(ThreeOfAKind):
+			switch cards["J"] {
+			case 1:
+				return int(FourOfAKind)
+			case 2:
+				return int(FiveOfAKind)
+			default:
+				return int(ThreeOfAKind)
+			}
+		}
+	}
+
+	// no hands found, check for joker hands
+	if js {
 		if cards["J"] == 1 {
 			return int(Pair)
 		} else if cards["J"] == 2 {
@@ -184,5 +186,5 @@ func identifyHand(hand string, js bool) int {
 		}
 	}
 
-	return goodCards
+	return 0
 }

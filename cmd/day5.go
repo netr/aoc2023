@@ -6,7 +6,6 @@ import (
 	"math"
 	"strings"
 
-	"net/http"
 	_ "net/http/pprof"
 
 	"github.com/netr/aoc/util"
@@ -22,9 +21,9 @@ var day5Cmd = &cobra.Command{
 		lines := util.ReadFileIntoSlice("data/day5.txt")
 		fmt.Println("URL: https://adventofcode.com/2023/day/5")
 
-		go func() {
-			log.Println(http.ListenAndServe("localhost:6060", nil))
-		}()
+		// go func() {
+		// 	log.Println(http.ListenAndServe("localhost:6060", nil))
+		// }()
 
 		fmt.Println("Part1:", getLowestSeedLocation(lines, false))
 		fmt.Println("Part2:", getLowestSeedLocation(lines, true))

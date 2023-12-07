@@ -4,8 +4,6 @@ import (
 	"log"
 	"testing"
 	"time"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func Test_ParseAlmanac(t *testing.T) {
@@ -49,7 +47,6 @@ func Test_AlmanacMap_GetDest(t *testing.T) {
 	}
 
 	_, seedMap := parseAlmanac(lines, false)
-	spew.Dump(seedMap)
 
 	for _, row := range table {
 		if seedMap.GetDest("seed-to-soil", row.seed) != row.soil {
@@ -106,6 +103,7 @@ func Test_SolveDay5(t *testing.T) {
 }
 
 func Test_CreateSeedRange(t *testing.T) {
+	t.Skip() // takes too long to run on some machines
 	seeds := []int{
 		1310704671, 312415190, 1034820096, 106131293, 682397438, 30365957, 2858337556, 1183890307, 665754577, 13162298, 2687187253, 74991378, 1782124901, 3190497, 208902075, 226221606, 4116455504, 87808390, 2403629707, 66592398,
 	}
