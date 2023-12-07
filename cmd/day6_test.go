@@ -9,6 +9,7 @@ func Test_SolveDay6(t *testing.T) {
 		"Time:      7  15   30",
 		"Distance:  9  40  200",
 	}
+
 	// first race lasts 7 ms, best distance is 9 mm
 	// Your toy boat has a starting speed of zero millimeters per millisecond. For each whole millisecond you spend at the beginning of the race holding down the button, the boat's speed increases by one millimeter per millisecond.
 	ans := solveDay6(races)
@@ -19,6 +20,11 @@ func Test_SolveDay6(t *testing.T) {
 	ans2 := solveDay6Kerning(convertRacesToKerning(races))
 	if ans2 != 71503 {
 		t.Errorf("ans2 should be 71503, got %d", ans2)
+	}
+
+	ans3 := solveDay6Quadratic(convertRacesToKerning(races))
+	if ans3 != 71503 {
+		t.Errorf("ans3 should be 71503, got %d", ans3)
 	}
 
 }

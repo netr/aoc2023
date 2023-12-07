@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/netr/aoc/util"
@@ -95,6 +96,21 @@ func solveDay6(races []string) int {
 	return ans
 }
 
+// https://www.reddit.com/r/adventofcode/comments/18bx00r/2023_day_6math_nope_theres_gotta_be_a_dumber_way/
+func solveDay6Quadratic(races []string) int {
+	times, dists := parseRaces(races)
+	t := float64(times[0])
+	d := float64(dists[0])
+
+	a := (t - math.Sqrt(math.Pow(t, 2)-4*d)) / 2
+	b := (t + math.Sqrt(math.Pow(t, 2)-4*d)) / 2
+	diff := math.Floor(b) - math.Ceil(a) + 1
+	return int(diff)
+}
+
+// a = (time - math.sqrt(time**2 - 4 * dist)) / 2
+// b = (time + math.sqrt(time**2 - 4 * dist)) / 2
+// return math.floor(b) - math.ceil(a) + 1
 func solveDay6Kerning(races []string) int {
 	times, dists := parseRaces(races)
 	raceTime := times[0]
