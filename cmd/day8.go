@@ -57,11 +57,11 @@ func solveDay8_Part2(lines []string, js bool) int {
 		dirIdx, steps int
 	)
 	dirs := lines[0]
-	items := lines[2:]
-	paths := makePathMap(items)
+	paths := lines[2:]
+	pathMap := makePathMap(paths)
 
 	// find all the start nodes
-	for p := range paths {
+	for p := range pathMap {
 		if strings.HasSuffix(p, "A") {
 			nodes = append(nodes, p)
 		}
@@ -74,9 +74,9 @@ func solveDay8_Part2(lines []string, js bool) int {
 		for steps == 0 || !strings.HasSuffix(node, "Z") {
 			steps += 1
 			if dirs[dirIdx] == 'L' {
-				node = paths[node][0]
+				node = pathMap[node][0]
 			} else {
-				node = paths[node][1]
+				node = pathMap[node][1]
 			}
 			dirIdx = (dirIdx + 1) % len(dirs)
 		}
@@ -92,23 +92,23 @@ func solveDay8_Part2(lines []string, js bool) int {
 	return ans
 }
 
-func makePathMap(items []string) map[string][]string {
+func makePathMap(paths []string) map[string][]string {
+	// example path = "JXD = (NFK, KMD)"
 	var (
-		itemSplit        []string
-		dirNodes         []string
-		name, dirs, node string
+		pathSplit  []string
+		dirNodes   []string
+		node, dirs string
 	)
-
-	itemMap := make(map[string][]string, len(items))
-	for _, item := range items {
-		// split the item into the name and the two nodes
-		itemSplit = strings.SplitN(item, " = ", 2)
-		name, dirs = itemSplit[0], itemSplit[1]
+	pathMap := make(map[string][]string, len(paths))
+	for _, p := range paths {
+		// split the path into the name and the two nodes
+		pathSplit = strings.SplitN(p, " = ", 2)
+		node, dirs = pathSplit[0], pathSplit[1]
 		// strip off the outer parens
-		node = dirs[1 : len(dirs)-1]
+		dirs = dirs[1 : len(dirs)-1]
 		// split the node into the two nodes. space after comma is important
-		dirNodes = strings.Split(node, ", ")
-		itemMap[name] = dirNodes
+		dirNodes = strings.Split(dirs, ", ")
+		pathMap[node] = dirNodes
 	}
-	return itemMap
+	return pathMap
 }
