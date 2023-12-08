@@ -87,8 +87,8 @@ func solveDay8_2(lines []string, js bool) int {
 
 	lcm := nodeTimes[0]
 	nodeTimes = nodeTimes[1:]
-	for _, num := range nodeTimes {
-		lcm = lcm * num / gcd(lcm, num)
+	for _, t := range nodeTimes {
+		lcm = util.LCM(lcm, t)
 	}
 	return lcm
 }
@@ -103,13 +103,4 @@ func makePathMap(items []string) map[string][]string {
 		newItems[i[0]] = is
 	}
 	return newItems
-}
-
-func gcd(a, b int) int {
-	for b != 0 {
-		t := b
-		b = a % b
-		a = t
-	}
-	return a
 }
