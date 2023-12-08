@@ -28,17 +28,7 @@ func init() {
 func solveDay8(lines []string, js bool) int {
 	dirs := lines[0]
 	items := lines[2:]
-
-	newItems := make(map[string][]string, len(items))
-	newItemsIdx := make(map[string]int, len(items))
-	for idx, item := range items {
-		i := strings.Split(item, " = ")
-		x := strings.TrimLeft(i[1], "(")
-		x = strings.TrimRight(x, ")")
-		is := strings.Split(x, ", ")
-		newItems[i[0]] = is
-		newItemsIdx[i[0]] = idx
-	}
+	paths := makePathMap(items)
 
 	times := 0
 	curVal := "AAA"
@@ -46,12 +36,12 @@ func solveDay8(lines []string, js bool) int {
 		for _, c := range dirs {
 			times++
 			if c == 'L' {
-				curVal = newItems[curVal][0]
+				curVal = paths[curVal][0]
 				if curVal == "ZZZ" {
 					break
 				}
 			} else if c == 'R' {
-				curVal = newItems[curVal][1]
+				curVal = paths[curVal][1]
 				if curVal == "ZZZ" {
 					break
 				}
@@ -68,69 +58,51 @@ func solveDay8(lines []string, js bool) int {
 func solveDay8_2(lines []string, js bool) int {
 	dirs := lines[0]
 	items := lines[2:]
+	paths := makePathMap(items)
 
+	var nodes []string
+	for p := range paths {
+		if strings.HasSuffix(p, "A") {
+			nodes = append(nodes, p)
+		}
+	}
+
+	var nodeTimes []int
+	dirIdx := 0
+	times := 0
+	for _, node := range nodes {
+		times = 0
+		dirIdx = 0
+		for times == 0 || !strings.HasSuffix(node, "Z") {
+			times += 1
+			if dirs[dirIdx] == 'L' {
+				node = paths[node][0]
+			} else {
+				node = paths[node][1]
+			}
+			dirIdx = (dirIdx + 1) % len(dirs)
+		}
+		nodeTimes = append(nodeTimes, times)
+	}
+
+	lcm := nodeTimes[0]
+	nodeTimes = nodeTimes[1:]
+	for _, num := range nodeTimes {
+		lcm = lcm * num / gcd(lcm, num)
+	}
+	return lcm
+}
+
+func makePathMap(items []string) map[string][]string {
 	newItems := make(map[string][]string, len(items))
-	newItemsIdx := make(map[string]int, len(items))
-	for idx, item := range items {
+	for _, item := range items {
 		i := strings.Split(item, " = ")
 		x := strings.TrimLeft(i[1], "(")
 		x = strings.TrimRight(x, ")")
 		is := strings.Split(x, ", ")
 		newItems[i[0]] = is
-		newItemsIdx[i[0]] = idx
 	}
-
-	fmt.Println(dirs)
-
-	// times := 0
-	var starts []string
-	for k := range newItems {
-		if strings.HasSuffix(k, "A") {
-			starts = append(starts, k)
-		}
-	}
-
-	var startTimes [][]int
-
-	for _, start := range starts {
-		times := 0
-		startDirs := dirs
-		firstMatch := ""
-		timesRes := []int{}
-
-		for {
-			for times == 0 || !strings.HasSuffix(start, "Z") {
-				times += 1
-				if startDirs[0] == 'L' {
-					start = newItems[start][0]
-				} else {
-					start = newItems[start][1]
-				}
-				startDirs = startDirs[1:] + startDirs[0:1]
-			}
-			timesRes = append(timesRes, times)
-
-			if firstMatch == "" {
-				firstMatch = start
-				times = 0
-			} else if start == firstMatch {
-				break
-			}
-		}
-
-		startTimes = append(startTimes, timesRes)
-	}
-
-	var nums []int
-	for _, t := range startTimes {
-		nums = append(nums, t[0])
-	}
-	lcm := nums[0]
-	nums = nums[1:]
-	for _, num := range nums {
-		lcm = lcm * num / gcd(lcm, num)
-	}
-	return lcm
+	return newItems
 }
 
 func gcd(a, b int) int {
