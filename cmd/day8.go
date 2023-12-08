@@ -17,7 +17,7 @@ var day8Cmd = &cobra.Command{
 		lines := util.ReadFileIntoSlice("data/day8.txt")
 		fmt.Println("URL: https://adventofcode.com/2023/day/8")
 		fmt.Println("Part1:", solveDay8(lines, false))
-		fmt.Println("Part2:", solveDay8_2(lines, true))
+		fmt.Println("Part2:", solveDay8_Part2(lines, true))
 	},
 }
 
@@ -55,21 +55,24 @@ func solveDay8(lines []string, js bool) int {
 	return times
 }
 
-func solveDay8_2(lines []string, js bool) int {
+func solveDay8_Part2(lines []string, js bool) int {
+	var (
+		nodes         []string
+		zTimes        []int
+		dirIdx, times int
+	)
 	dirs := lines[0]
 	items := lines[2:]
 	paths := makePathMap(items)
 
-	var nodes []string
+	// find all the start nodes
 	for p := range paths {
 		if strings.HasSuffix(p, "A") {
 			nodes = append(nodes, p)
 		}
 	}
 
-	var nodeTimes []int
-	dirIdx := 0
-	times := 0
+	// find the number of times it takes to get to Z for each start node
 	for _, node := range nodes {
 		times = 0
 		dirIdx = 0
@@ -82,25 +85,34 @@ func solveDay8_2(lines []string, js bool) int {
 			}
 			dirIdx = (dirIdx + 1) % len(dirs)
 		}
-		nodeTimes = append(nodeTimes, times)
+		zTimes = append(zTimes, times)
 	}
 
-	lcm := nodeTimes[0]
-	nodeTimes = nodeTimes[1:]
-	for _, t := range nodeTimes {
-		lcm = util.LCM(lcm, t)
+	// use first item as initial value for LCM
+	ans := zTimes[0]
+	zTimes = zTimes[1:]
+	for _, t := range zTimes {
+		ans = util.LCM(ans, t)
 	}
-	return lcm
+	return ans
 }
 
 func makePathMap(items []string) map[string][]string {
-	newItems := make(map[string][]string, len(items))
+	var (
+		itemSplit        []string
+		dirNodes         []string
+		name, dirs, node string
+	)
+
+	itemMap := make(map[string][]string, len(items))
 	for _, item := range items {
-		i := strings.Split(item, " = ")
-		x := strings.TrimLeft(i[1], "(")
-		x = strings.TrimRight(x, ")")
-		is := strings.Split(x, ", ")
-		newItems[i[0]] = is
+		itemSplit = strings.Split(item, " = ")
+		name = itemSplit[0]
+		dirs = itemSplit[1]
+		node = strings.TrimLeft(dirs, "(")
+		node = strings.TrimRight(node, ")")
+		dirNodes = strings.Split(node, ", ")
+		itemMap[name] = dirNodes
 	}
-	return newItems
+	return itemMap
 }
