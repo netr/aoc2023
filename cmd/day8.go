@@ -30,36 +30,31 @@ func solveDay8(lines []string, js bool) int {
 	items := lines[2:]
 	paths := makePathMap(items)
 
-	times := 0
-	curVal := "AAA"
+	steps := 0
+	node := "AAA"
 	for {
 		for _, c := range dirs {
-			times++
+			steps++
 			if c == 'L' {
-				curVal = paths[curVal][0]
-				if curVal == "ZZZ" {
-					break
+				node = paths[node][0]
+				if node == "ZZZ" {
+					return steps
 				}
 			} else if c == 'R' {
-				curVal = paths[curVal][1]
-				if curVal == "ZZZ" {
-					break
+				node = paths[node][1]
+				if node == "ZZZ" {
+					return steps
 				}
 			}
 		}
-		if curVal == "ZZZ" {
-			break
-		}
 	}
-
-	return times
 }
 
 func solveDay8_Part2(lines []string, js bool) int {
 	var (
 		nodes         []string
-		zTimes        []int
-		dirIdx, times int
+		zSteps        []int
+		dirIdx, steps int
 	)
 	dirs := lines[0]
 	items := lines[2:]
@@ -72,12 +67,12 @@ func solveDay8_Part2(lines []string, js bool) int {
 		}
 	}
 
-	// find the number of times it takes to get to Z for each start node
+	// find the number of steps it takes to get to Z for each start node
 	for _, node := range nodes {
-		times = 0
+		steps = 0
 		dirIdx = 0
-		for times == 0 || !strings.HasSuffix(node, "Z") {
-			times += 1
+		for steps == 0 || !strings.HasSuffix(node, "Z") {
+			steps += 1
 			if dirs[dirIdx] == 'L' {
 				node = paths[node][0]
 			} else {
@@ -85,13 +80,13 @@ func solveDay8_Part2(lines []string, js bool) int {
 			}
 			dirIdx = (dirIdx + 1) % len(dirs)
 		}
-		zTimes = append(zTimes, times)
+		zSteps = append(zSteps, steps)
 	}
 
 	// use first item as initial value for LCM
-	ans := zTimes[0]
-	zTimes = zTimes[1:]
-	for _, t := range zTimes {
+	ans := zSteps[0]
+	zSteps = zSteps[1:]
+	for _, t := range zSteps {
 		ans = util.LCM(ans, t)
 	}
 	return ans
@@ -106,11 +101,12 @@ func makePathMap(items []string) map[string][]string {
 
 	itemMap := make(map[string][]string, len(items))
 	for _, item := range items {
-		itemSplit = strings.Split(item, " = ")
-		name = itemSplit[0]
-		dirs = itemSplit[1]
-		node = strings.TrimLeft(dirs, "(")
-		node = strings.TrimRight(node, ")")
+		// split the item into the name and the two nodes
+		itemSplit = strings.SplitN(item, " = ", 2)
+		name, dirs = itemSplit[0], itemSplit[1]
+		// strip off the outer parens
+		node = dirs[1 : len(dirs)-1]
+		// split the node into the two nodes. space after comma is important
 		dirNodes = strings.Split(node, ", ")
 		itemMap[name] = dirNodes
 	}
