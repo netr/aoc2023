@@ -64,9 +64,9 @@ func extrapolateHistory(line []int) int {
 	// iterate over poop from the bottom up
 	history[len(history)-1] = append(history[len(history)-1], 0)
 	for i := len(history) - 2; i >= 0; i-- {
-		lastBefore := history[i+1][len(history[i+1])-1]
-		lastCur := history[i][len(history[i])-1]
-		history[i] = append(history[i], lastBefore+lastCur)
+		before := history[i+1][len(history[i+1])-1]
+		curr := history[i][len(history[i])-1]
+		history[i] = append(history[i], before+curr)
 	}
 
 	return history[0][len(history[0])-1]
@@ -80,9 +80,9 @@ func extrapolateHistoryPart2(line []int) int {
 	// iterate over poop from the bottom up
 	history[len(history)-1] = append([]int{0}, history[len(history)-1]...)
 	for i := len(history) - 2; i >= 0; i-- {
-		lastBefore := history[i+1][0]
-		lastCur := history[i][0]
-		history[i] = append([]int{lastCur - lastBefore}, history[i]...)
+		before := history[i+1][0]
+		curr := history[i][0]
+		history[i] = append([]int{curr - before}, history[i]...)
 	}
 
 	return history[0][0]
