@@ -34,19 +34,20 @@ func solveDay10(lines []string, p2 bool) int {
 	queue := list.New()
 	queue.PushBack([2]int{sr, sc})
 
-	is_valid_up := func(ch rune) bool {
+	is_north := func(ch rune) bool {
 		return ch == 'S' || ch == '|' || ch == 'J' || ch == 'L'
 	}
-	is_valid_down := func(ch rune) bool {
+	is_south := func(ch rune) bool {
 		return ch == 'S' || ch == '|' || ch == '7' || ch == 'F'
 	}
-	is_valid_left := func(ch rune) bool {
+	is_west := func(ch rune) bool {
 		return ch == 'S' || ch == '-' || ch == 'J' || ch == '7'
 	}
-	is_valid_right := func(ch rune) bool {
+	is_east := func(ch rune) bool {
 		return ch == 'S' || ch == '-' || ch == 'L' || ch == 'F'
 	}
 
+	// bfs
 	for queue.Len() > 0 {
 		qi, ok := queue.Remove(queue.Front()).([2]int)
 		if !ok {
@@ -55,27 +56,32 @@ func solveDay10(lines []string, p2 bool) int {
 		row, col := qi[0], qi[1]
 		cur := grid[row][col]
 
-		if row > 0 && is_valid_up(cur) && is_valid_down(grid[row-1][col]) && !visited[[2]int{row - 1, col}] {
+		// if cur pipe is north, and the pipe above is south, and we haven't visited it yet
+		if row > 0 && is_north(cur) && is_south(grid[row-1][col]) && !visited[[2]int{row - 1, col}] {
 			visited[[2]int{row - 1, col}] = true
 			queue.PushBack([2]int{row - 1, col})
 		}
 
-		if row < len(grid)-1 && is_valid_down(cur) && is_valid_up(grid[row+1][col]) && !visited[[2]int{row + 1, col}] {
+		// if cur pipe is south, and the pipe below is north, and we haven't visited it yet
+		if row < len(grid)-1 && is_south(cur) && is_north(grid[row+1][col]) && !visited[[2]int{row + 1, col}] {
 			visited[[2]int{row + 1, col}] = true
 			queue.PushBack([2]int{row + 1, col})
 		}
 
-		if col > 0 && is_valid_left(cur) && is_valid_right(grid[row][col-1]) && !visited[[2]int{row, col - 1}] {
+		// if cur pipe is west, and the pipe to the left is east, and we haven't visited it yet
+		if col > 0 && is_west(cur) && is_east(grid[row][col-1]) && !visited[[2]int{row, col - 1}] {
 			visited[[2]int{row, col - 1}] = true
 			queue.PushBack([2]int{row, col - 1})
 		}
 
-		if col < len(grid[row])-1 && is_valid_right(cur) && is_valid_left(grid[row][col+1]) && !visited[[2]int{row, col + 1}] {
+		// if cur pipe is east, and the pipe to the right is west, and we haven't visited it yet
+		if col < len(grid[row])-1 && is_east(cur) && is_west(grid[row][col+1]) && !visited[[2]int{row, col + 1}] {
 			visited[[2]int{row, col + 1}] = true
 			queue.PushBack([2]int{row, col + 1})
 		}
 	}
 
+	// the farthest point is the number of visited points / 2 since this would be the middle of the traversal
 	return len(visited) / 2
 }
 
